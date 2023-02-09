@@ -140,7 +140,7 @@
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-12-15 10:58:12.998164",
+ "modified": "2023-01-23 13:50:19.418846",
  "modified_by": "Administrator",
  "module": "Slnee",
  "name": "Add Items to Store Tool",
@@ -152,7 +152,7 @@
    "email": 1,
    "print": 1,
    "read": 1,
-   "role": "System Manager",
+   "role": "store Manager",
    "share": 1,
    "write": 1
   }

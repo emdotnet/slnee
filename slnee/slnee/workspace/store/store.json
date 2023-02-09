@@ -74,8 +74,8 @@
   {
    "hidden": 0,
    "is_query_report": 0,
-   "label": "Attribute",
-   "link_to": "Product Attribute",
+   "label": "Heights",
+   "link_to": "height",
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
@@ -123,9 +123,18 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Item Sync Tool",
+   "link_to": "Item Sync Tool",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2022-12-14 09:16:25.382596",
+ "modified": "2023-01-15 15:58:56.127302",
  "modified_by": "Administrator",
  "module": "Slnee",
  "name": "Store",

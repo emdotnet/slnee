@@ -83,6 +83,7 @@
    "default": "simple",
    "fieldname": "type",
    "fieldtype": "Select",
+   "in_standard_filter": 1,
    "label": "Type",
    "options": "simple\ngrouped\nexternal\nvariable"
   },
@@ -102,7 +103,7 @@
   },
   {
    "fieldname": "description",
-   "fieldtype": "Small Text",
+   "fieldtype": "Text Editor",
    "label": "Description"
   },
   {
@@ -353,7 +354,7 @@
  "image_field": "image_1",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-12-15 10:12:30.861607",
+ "modified": "2023-01-23 13:49:59.343201",
  "modified_by": "Administrator",
  "module": "Slnee",
  "name": "Store Item",
@@ -367,7 +368,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "System Manager",
+   "role": "store Manager",
    "share": 1,
    "write": 1
   }

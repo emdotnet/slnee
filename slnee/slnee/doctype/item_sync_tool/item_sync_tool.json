@@ -1,0 +1,98 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2022-12-21 12:03:22.247165",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "sync_all",
+  "column_break_2",
+  "rename",
+  "column_break_4",
+  "sync_stock",
+  "section_break_2",
+  "category",
+  "add_items",
+  "remove_all",
+  "section_break_10",
+  "items"
+ ],
+ "fields": [
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "label": "category",
+   "options": "Store Category"
+  },
+  {
+   "fieldname": "add_items",
+   "fieldtype": "Button",
+   "label": "add Items"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Sync Item List"
+  },
+  {
+   "fieldname": "section_break_2",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "sync_all",
+   "fieldtype": "Button",
+   "label": "Sync ALL"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "rename",
+   "fieldtype": "Button",
+   "label": "Sync"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "sync_stock",
+   "fieldtype": "Button",
+   "label": "Sync Stock"
+  },
+  {
+   "fieldname": "section_break_10",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "remove_all",
+   "fieldtype": "Button",
+   "label": "Remove All"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2023-01-08 17:10:00.195043",
+ "modified_by": "Administrator",
+ "module": "Slnee",
+ "name": "Item Sync Tool",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

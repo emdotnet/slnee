@@ -10,11 +10,14 @@
   "price",
   "sale_price",
   "stock",
+  "backorders",
+  "default",
   "tax",
   "warehouse",
   "column_break_7",
   "term",
   "id",
+  "description",
   "image",
   "warehouse_type"
  ],
@@ -85,12 +88,31 @@
    "fieldname": "image",
    "fieldtype": "Attach Image",
    "label": "Image"
+  },
+  {
+   "default": "No",
+   "fieldname": "backorders",
+   "fieldtype": "Select",
+   "label": "Allow Backorders?",
+   "options": "No\nYes, but with customer notification\nYes"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text Editor",
+   "label": "Description"
+  },
+  {
+   "default": "0",
+   "fieldname": "default",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Default"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2022-12-14 16:19:08.119730",
+ "modified": "2023-01-25 12:28:19.913540",
  "modified_by": "Administrator",
  "module": "Slnee",
  "name": "Store Item List",

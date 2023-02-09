@@ -221,9 +221,8 @@ as_dict=1,
 			self.entity_names.setdefault(d.entity, d.entity_name)
 
 	def get_sales_transactions_based_on_items(self):
-
 		if self.filters["value_quantity"] == "Value":
-			value_field = "base_amount"
+			value_field = "base_net_amount"
 
 		else:
 			value_field = "stock_qty"
@@ -279,7 +278,7 @@ as_dict=1,
 
 	def get_sales_transactions_based_on_item_group(self):
 		if self.filters["value_quantity"] == "Value":
-			value_field = "base_amount"
+			value_field = "base_net_amount"
 		else:
 			value_field = "qty"
 		if self.filters["doc_type"]=="Sales Order" and  "exclude_closed" in list(self.filters.keys())  and self.filters["exclude_closed"]:

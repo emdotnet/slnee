@@ -57,7 +57,7 @@
  "image_field": "image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2022-11-22 11:01:15.558479",
+ "modified": "2023-01-23 13:51:30.632051",
  "modified_by": "Administrator",
  "module": "Slnee",
  "name": "Store Category",
@@ -71,7 +71,7 @@
    "print": 1,
    "read": 1,
    "report": 1,
-   "role": "System Manager",
+   "role": "store Manager",
    "share": 1,
    "write": 1
   }

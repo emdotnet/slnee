@@ -3,7 +3,8 @@
 
 import frappe
 from frappe.model.document import Document
-
+from slnee.slnee.doctype.wordpress_store.wordpress_store import get_api
+from frappe import _
 class AddItemstoStoreTool(Document):
 	@frappe.whitelist()
 	def insert_items(self):
@@ -24,10 +25,22 @@ class AddItemstoStoreTool(Document):
 			category_name=self.old_category
 			if not category_name:
 				return
+		create=[]
+		exist=0
 		for i in self.items:
+			if len(create)>9:
+				break
 			item=frappe.get_doc("Item",i.item)
+			if frappe.db.exists("Store Item",i.item):
+				if frappe.db.get_value("Store Item",i.item,"id"):
+					exist+=1
+					continue
+				else:
+					doc=frappe.get_doc("Store Item",i.item)
+					create.append(doc.get_data())
+					continue
 			doc = frappe.new_doc('Store Item')
-			doc.update_store=1
+			doc.update_store=0
 			doc.name1=i.item
 			doc.warehouse=self.warehouse
 			doc.type="simple"
@@ -46,13 +59,28 @@ class AddItemstoStoreTool(Document):
 			category=doc.append("categories",{})
 			category.category=category_name
 			doc.insert()
+			create.append(doc.get_data())
+		#frappe.db.commit()
+		#frappe.throw(str(create))
+		data={"create":create}
+		if True:
+			wcapi=get_api(100)
+			r=wcapi.post("products/batch", data).json()
+			r=r["create"]
+			for i in r:
+				frappe.db.set_value("Store Item",i["name"],"id",i["id"])
+				frappe.db.set_value("Store Item",i["name"],"permalink",i["permalink"])
 			frappe.db.commit()
-
-
+			frappe.msgprint(_("{} items were added to the shop succesfully.").format(len(create)),alert=True,indicator="green")
+			self.items=[]
+			self.get_items(self.item_group)
+		else:
+			frappe.throw("Unknown Error")
 	@frappe.whitelist()
 	def set_defaults(self):
 		settings=frappe.get_doc("Wordpress Store")
-		self.warehouse=settings.default_warehouse or ""
+		if not self.warehouse:
+			self.warehouse=settings.default_warehouse or ""
 		self.price_list=settings.price_list or ""
 		self.tax_template=settings.sales_taxes_and_charges_template or ""
 
@@ -64,16 +92,23 @@ class AddItemstoStoreTool(Document):
 		have_price=self.have_price_list
 		in_stock=self.in_stock
 		n=0
+		warehouses=[w.warehouse for w in self.warehouse]
+		#frappe.throw(str(warehouses))
 		for i in items:
 			price=0
 			stock=0
 			rates=frappe.db.get_list("Item Price",filters={"item_code":i.name,"price_list":self.price_list},fields=["price_list_rate"],order_by="valid_from desc")
 			if len(rates)>0:
 				price=rates[0]["price_list_rate"]
-			bins=frappe.db.get_list("Bin",filters={"item_code":i.name,"warehouse":self.warehouse},fields=["actual_qty"])
-			if len(bins)>0:
-					stock=bins[0]["actual_qty"]
+			f=[["item_code",'in',[i.name]]]
+			if len(warehouses)>0:
+				f.append(["warehouse","in",warehouses])
+			bins=frappe.db.get_list("Bin",filters=f,fields=["actual_qty"])
+			for b in bins:
+					stock+=b["actual_qty"]
 			if (price or not have_price)  and (stock or not in_stock):
+				if frappe.db.exists("Store Item",i["name"]):
+					continue
 				add=self.append("items",{})
 				add.price=price
 				add.stock=stock

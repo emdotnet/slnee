@@ -13,13 +13,34 @@ frappe.ui.form.on('Add Items to Store Tool', {
 	have_price_list: function(frm){refresh_items(frm)},
 	in_stock: function(frm){refresh_items(frm)},
 	insert:function(frm){insert_items(frm)},
+	warehouse:function(frm){
+		refresh_items(frm)
+	},
 });
 
 frappe.ui.form.on("Store Item List",{
 
 	item(frm,cdt,cdn){
-		let row = frappe.get_doc(cdt, cdn);
-		console.log("item added");
+		var warehouses=[];
+		if (frm.doc.warehouse){
+			for (var i=0;i<frm.doc.warehouse.length;i++){
+			warehouses.push(frm.doc.warehouse[i].warehouse)
+		}}
+		let item= frappe.get_doc(cdt, cdn);
+		frappe.call({
+			async:false,
+			args:{"item":item.item,"warehouse":warehouses},
+			method:"slnee.slnee.doctype.store_item.store_item.get_item_info",
+			callback(r) {
+				if(r.message){
+					var ans=r.message.split("#");
+					item.price=parseFloat(ans[0]);
+					item.tax=parseFloat(ans[2])
+					item.stock=parseFloat(ans[1]);
+				}
+			}
+		})
+		frm.refresh_field("items");
 		}
 
 

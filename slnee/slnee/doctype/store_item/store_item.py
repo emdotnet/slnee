@@ -24,6 +24,13 @@ class StoreItem(Document):
 				frappe.throw("Items table is empty!")
 			terms=[i.term for i in self.items]
 			#frappe.throw(str(terms))
+			defau=False
+			for t in self.items:
+				if t.default:
+					if defau:
+						frappe.throw(_("Only one variable can be considered as defaut."))
+					else:
+						defau=True
 			for i in range(len(terms)):
 				if not terms[i]:
 					frappe.throw("Variant is missing in table items line {}.".format(i+1))
@@ -57,20 +64,8 @@ class StoreItem(Document):
 			self.save()
 			frappe.db.commit()
 			return
-		datas=self.get_data()
-		#frappe.throw(str(datas))
-		wcapi=get_api(timeout=15)
-		if wcapi ==-1:
-			frappe.throw("Failed o connect To server.")
-		r=wcapi.post("products",data=datas).json()
-		try:
-			self.id=r["id"]
-			self.permalink=r["permalink"]
-			self.save()
-			frappe.db.commit()
-			frappe.msgprint("saved to store")
-		except:
-			pass
+		
+		self.sync_to_store(show_alert=True,save=True)
 		return
 
 	def after_delete(self):
@@ -88,15 +83,9 @@ class StoreItem(Document):
 			return
 		if not self.id or not self.update_store:
 			return
-		url="products/"+str(self.id)
-		data=self.get_data()
-		try:
-			wcapi=get_api(timeout=10)
-			r=wcapi.put(url,data).json()
-			#frappe.msgprint(self.saved,raise_exception=False)
-		except:
-			#frappe.msgprint(self.not_saved,raise_exception=False)
-			return
+		self.sync_to_store(show_alert=True,save=False)
+		return
+
 
 	@frappe.whitelist()
 	def sync_name(self,show_alert=False):
@@ -129,7 +118,28 @@ class StoreItem(Document):
 			return
 
 	@frappe.whitelist()
-	def sync_to_store(self,show_alert=False):
+	def set_default(self):
+		defau=""
+		if self.type=="variable":
+			for i in self.items:
+				if i.default:
+					defau=i.term
+					break
+		defau_att=[{"name":self.attribute,"option":defau}]
+		d={"default_attributes":defau_att}
+		#return(d)
+		url="products/"+str(self.id)
+		try:
+			wcapi=get_api(timeout=15)
+			r=wcapi.put(url,d).json()
+			if r["default_attributes"]:
+				frappe.msgprint(_("Default Variable set to {}").format(defau),alert=True,indicator="green")
+		except:
+			pass
+	
+	@frappe.whitelist()
+	def sync_to_store(self,show_alert=False,save=True,wcapi=None):
+		defau=""
 		if self.type=="variable":
 			if not self.attribute:
 				frappe.throw("Atribute is missing")
@@ -137,10 +147,17 @@ class StoreItem(Document):
 			for i in self.items:
 				if not i.term:
 					frappe.throw("Term is missing in line {}".format(l))
+				if i.default:
+					defau=i.term
 				l+=1
 		if not self.id :
 			datas=self.get_data()
-			wcapi=get_api(timeout=15)
+			if defau:
+				defau_att=[{"name":self.attribute,"option":defau}]
+				datas["default_attributes"]=defau_att
+				
+			if not wcapi:
+				wcapi=get_api(timeout=30)
 			if wcapi ==-1:
 				frappe.throw("Failed o connect To server.")
 			r=wcapi.post("products",data=datas).json()
@@ -148,8 +165,9 @@ class StoreItem(Document):
 			if True:
 				self.id=r["id"]
 				self.permalink=r["permalink"]
-				self.save()
-				frappe.db.commit()
+				if save:
+					self.save()
+					frappe.db.commit()
 				if show_alert:
 					frappe.msgprint(_("Item inserted to the Shop."),alert=True,indicator="green")
 			else:
@@ -158,8 +176,12 @@ class StoreItem(Document):
 		else:
 			url="products/"+str(self.id)
 			data=self.get_data()
+			if defau:
+				defau_att=[{"name":self.attribute,"option":defau}]
+				data["default_attributes"]=defau_att 
+				#frappe.throw(str(data))
 			if True:
-				wcapi=get_api(timeout=10)
+				wcapi=get_api(timeout=30)
 				r=wcapi.put(url,data).json()
 				if show_alert:
 					frappe.msgprint(_("Item synced with the shop."),alert=True,indicator="green")
@@ -187,11 +209,23 @@ class StoreItem(Document):
 					re={"delete":delete}
 					for i in self.items:
 						d={"regular_price":str(i.price*1.15),"stock_quantity":str(i.stock),"attributes":[{"name":self.attribute,"option":i.term}]}
-
-
+						#if i.stock and int(i.stock)>0:
+						#	d["manage_stock"]=True
+						#if True:
+						d["manage_stock"]=True
+						b="no"
+						if i.backorders=="Yes":
+							b="yes"
+						elif i.backorders=="No":
+							b="no"
+						else:
+							b="notify" 
+						d["backorders"]=b
 						if i.image:
 							site_url="https://business.zerabi.deom.com.sa"
 							d["image"]={"src":site_url+i.image}
+						desc=i.description if i.description else ""
+						d["description"]=desc
 						if i.sale_price:
 							d["sale_price"]=str(i.sale_price)
 						#frappe.throw(str(d))
@@ -214,8 +248,9 @@ class StoreItem(Document):
 						frappe.msgprint(_("Variants updated for item {}.".format(self.name)),alert=True,indicator="green")
 					self.variants=ids
 					self.last_sync=frappe.utils.get_datetime()
-					self.save()
-					frappe.db.commit()
+					if save:
+						self.save()
+						frappe.db.commit()
 			else:
 				frappe.throw("Unknown error")
 				return
