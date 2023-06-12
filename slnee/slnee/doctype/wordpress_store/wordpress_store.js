@@ -25,6 +25,22 @@ frappe.ui.form.on('Wordpress Store', {
 }
 		})
 	},
+	get_names : function(frm){
+		frm.call({
+			doc:frm.doc,
+			freeze:true,
+			freeze_message: __("Fetching Names, please wait."),
+			method: "get_names",
+		});
+	},
+	get_descriptions  : function(frm){
+		frm.call({
+			doc:frm.doc,
+			freeze:true,
+			freeze_message: __("Fetching Descriptions, please wait."),
+			method: "get_descriptions",
+		})
+	},
 	get_attributes : function(frm){
 		frm.call({
 			doc:frm.doc,

@@ -17,6 +17,7 @@ frappe.ui.form.on('Warehouse Assignment', {
 	select_all:function(frm){
 		for (var i =0;i<frm.doc.warehouses.length;i++){
 			frm.doc.warehouses[i].enabled=1;
+			frm.doc.warehouses[i].delivery_note=1;
 		}
 		frm.set_value("select_all",1);
 		refresh_field("warehouses")
@@ -24,6 +25,7 @@ frappe.ui.form.on('Warehouse Assignment', {
 	unselect_all:function(frm){
 		for (var i =0;i<frm.doc.warehouses.length;i++){
 			frm.doc.warehouses[i].enabled=0;
+			frm.doc.warehouses[i].delivery_note=0;
 		}
 		frm.set_value("unselect_all",1);
 		refresh_field("warehouses")

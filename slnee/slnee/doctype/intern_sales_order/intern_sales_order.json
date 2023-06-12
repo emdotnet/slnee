@@ -45,7 +45,7 @@
    "in_list_view": 1,
    "in_standard_filter": 1,
    "label": "Status",
-   "options": "\nDraft\nOpen\nManufactured\nPartially Manufactured\nCancelled",
+   "options": "\nDraft\nOpen\nManufactured\nPartially Manufactured\nCancelled\nClosed",
    "read_only": 1,
    "reqd": 1
   },
@@ -74,8 +74,25 @@
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
- "links": [],
- "modified": "2022-09-09 10:16:59.896645",
+ "links": [
+  {
+   "link_doctype": "Work Order",
+   "link_fieldname": "intern_sales_order"
+  },
+  {
+   "is_child_table": 1,
+   "link_doctype": "Stock Entry Detail",
+   "link_fieldname": "intern_sales_order",
+   "parent_doctype": "Stock Entry",
+   "table_fieldname": "items"
+  },
+  {
+   "custom": 1,
+   "link_doctype": "Material Request",
+   "link_fieldname": "intern_order"
+  }
+ ],
+ "modified": "2023-06-12 15:31:24.121329",
  "modified_by": "Administrator",
  "module": "Slnee",
  "name": "Intern Sales Order",

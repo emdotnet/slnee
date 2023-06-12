@@ -7,7 +7,8 @@
 //styleSheet.innerText = styles;
 //document.head.appendChild(styleSheet);
 const style = document.createElement('style');
-style.innerHTML=".summary-value{line-height:25px !important;}";
+style.innerHTML=".summary-value{line-height:25px !important;margin:0 10px !important;}";
+
 document.head.appendChild(style);
 
 

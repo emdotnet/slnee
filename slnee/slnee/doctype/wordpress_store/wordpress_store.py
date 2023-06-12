@@ -128,14 +128,70 @@ class WordpressStore(Document):
 			doc.insert(ignore_if_duplicate=True)
 
 		frappe.db.commit()
-
+	@frappe.whitelist()
+	def get_names(self):
+		wcapi=self.get_api()
+		if wcapi==-1:
+			return
+		tt=1
+		changed=0
+		while(True):
+			products=wcapi.get("products",params={"per_page":100,"page":tt}).json()
+			if len(products)==0:
+				break
+			for p in products:
+				l=frappe.db.get_list("Store Item",filters={"id":p["id"]})
+				if len(l)==0:
+					continue
+				name=l[0]["name"]
+				if name==p["name"]:
+					continue
+				frappe.db.set_value("Store Item",name,"name1",p["name"])
+				frappe.db.set_value("Store Item",name,"name",p["name"])
+				store_category_items=frappe.db.get_list("Store Category Item",filters={"parent":name},fields=["name"])
+				for s in store_category_items:
+					frappe.db.set_value("Store Category Item",s["name"],"parent",p["name"])
+				changed+=1
+			tt+=1
+		if changed>0:
+			alert("{} Item(s) were updated.".format(changed))
+		else:
+			alert("No changes.","orange")
+	@frappe.whitelist()
+	def get_descriptions(self):
+		wcapi=self.get_api()
+		if wcapi==-1:
+			return
+		tt=1
+		changed=0
+		while(True):
+			products=wcapi.get("products",params={"per_page":100,"page":tt}).json()
+			if len(products)==0:
+				break
+			for p in products:
+				try:
+					old_desc=frappe.db.get_value("Store Item",p["name"],"description")
+					if old_desc!=p["description"]:
+						frappe.db.set_value("Store Item",p["name"],"description",p["description"])
+						changed+=1
+				except:
+					continue
+			tt+=1
+		if changed>0:
+			alert("{} Item(s) were updated.".format(changed))
+		else:
+			alert("No changes.","orange")
 	@frappe.whitelist()
 	def get_products(self):
 		wcapi=self.get_api()
 		if wcapi==-1:
 			return
-		products=wcapi.get("products",params={"per_page":100})
+		new=0
+		products=wcapi.get("products",params={"per_page":100,"page":2})
 		for p in products.json():
+			if len(frappe.db.exists({"doctype":"Store Item","id":p["id"]})) >0:
+				continue
+			new+=1
 			doc=frappe.new_doc("Store Item")
 			doc.id=p["id"]
 			doc.update_store=0
@@ -186,6 +242,10 @@ class WordpressStore(Document):
 				category=doc.append("categories",{})
 				category.category=c["name"]
 			doc.insert(ignore_if_duplicate=True)
+		if new>0:
+			alert("{} Item(s) were added to the erp system.".format(new))
+		else:
+			alert("No Item were added to the system.","orange")
 		return 
 	@frappe.whitelist()
 	def get_customers(self):
@@ -271,3 +331,6 @@ def get_api(timeout=5):
 		return wcapi
 	except:
 		return -1
+
+def alert(msg,color="green"): 
+	frappe.msgprint( _(msg), alert=True, indicator=color)

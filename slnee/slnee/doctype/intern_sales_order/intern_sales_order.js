@@ -7,6 +7,7 @@ frappe.ui.form.on('Intern Sales Order', {
 
 		if (frm.doc.docstatus==1 && (frm.doc.status=="Open" || frm.doc.status=="Partially Manufactured")){
 			frm.add_custom_button(__('Work Order'), () => make_work_order(frm), __('Create'));
+			frm.add_custom_button(__('Material Request'), () => make_material_request(frm), __('Create'));
 	 }},
 	required_by :function(frm) {
 		for (var i =0;i<frm.doc.items.length;i++){
@@ -47,6 +48,14 @@ frappe.ui.form.on('Intern Sales Order ITem', {
 });
 
 
+
+function make_material_request(frm){
+	frappe.model.open_mapped_doc({
+		method: "slnee.slnee.doctype.intern_sales_order.intern_sales_order.create_material_request",
+		frm:frm
+	})
+
+}
 
 
 

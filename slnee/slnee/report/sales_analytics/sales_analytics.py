@@ -61,11 +61,20 @@ class Analytics(object):
 		summary = [
 			{"label":_("Total "+str(self.filters.tree_type)+"s"),"value":len(self.data),"indicator":"Red"},
 			{ "label":_("Total "+str(self.filters["value_quantity"])),"value":"{:,.2f} {}".format(self.totaltotal,unit),"indicator":"Blue"},
-			{ "label":_("Max")+" (<a href='https://business.zerabi.deom.com.sa/app/{}/{}' style='color:#4de3fa !important;'>{}</a>)".format(self.filters.tree_type.replace(" ","-").lower(),self.maxunit,self.maxunitname),"value":"{:,.2f} {}".format(self.maxvalue,unit),"indicator":"Green"},
+			#{ "label":_("Max")+" (<a href='https://business.zerabi.deom.com.sa/app/{}/{}' style='color:#4de3fa !important;'>{}</a>)".format(self.filters.tree_type.replace(" ","-").lower(),self.maxunit,self.maxunitname),"value":"{:,.2f} {}".format(self.maxvalue,unit),"indicator":"Green"},
 
 ]
-
-
+		company=self.filters.company
+		from_date=self.filters.from_date
+		to_date=self.filters.to_date
+		if self.filters.tree_type =="Sales Person":
+			total_unallocated=0
+			invoices=frappe.db.get_all("Sales Invoice",filters=[["Sales Invoice","posting_date","Between",[from_date,to_date]],["Sales Team","sales_person","is","not set"],["Sales Invoice","company","=",company]],fields=["net_total"])
+			for i in invoices:
+				total_unallocated+=i["net_total"]
+			summary.append({"label":_("Unallocated Invoices"),"value":"{:,.2f} {}".format(total_unallocated,unit),"indicator":"Orange"})
+			summary.append({"label":_("Total"),"value":"<span style='color:#c70eae;'>"+str("{:,.2f} {}".format(total_unallocated+self.totaltotal,unit))+"</span>","indicator":"Green"})
+		summary.append({ "label":_("Max")+" (<a href='https://business.zerabi.deom.com.sa/app/{}/{}' style='color:#4de3fa !important;'>{}</a>)".format(self.filters.tree_type.replace(" ","-").lower(),self.maxunit,self.maxunitname),"value":"{:,.2f} {}".format(self.maxvalue,unit),"indicator":"Green"})
 		return self.columns, self.data, None, self.chart, summary, skip_total_row
 
 	def get_columns(self):
@@ -148,7 +157,7 @@ class Analytics(object):
 			self.get_rows()
 	def get_sales_transactions_based_on_sales_person(self):
 		if self.filters["value_quantity"] == "Value":
-			value_field = "base_net_total"
+			value_field = "allocated_amount"
 
 		else:
 			value_field = "total_qty"
@@ -157,7 +166,7 @@ class Analytics(object):
 		else:
 			exclude=""
 
-		self.entries = frappe.db.sql( """ select st.sales_person as entity, s.{value_field} as value_field, s.{date_field}
+		self.entries = frappe.db.sql( """ select st.sales_person as entity, st.{value_field} as value_field, s.{date_field}
  from `tab{doctype}` as s,`tabSales Team`as st  where s.name = st.parent and  s.docstatus = 1 and s.company = %s and s.{date_field} between %s and %s
  and ifnull(st.sales_person, '') != '' {exclud} order by st.sales_person
  """.format( date_field=self.date_field, value_field=value_field,exclud=exclude, doctype=self.filters.doc_type ), (self.filters.company, self.filters.from_date, self.filters.to_date), 

@@ -132,9 +132,18 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Sales",
+   "link_to": "Sales",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2023-01-15 15:58:56.127302",
+ "modified": "2023-02-20 09:47:38.361332",
  "modified_by": "Administrator",
  "module": "Slnee",
  "name": "Store",

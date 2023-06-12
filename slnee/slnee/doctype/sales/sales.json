@@ -1,0 +1,97 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2023-02-12 12:37:13.522362",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "categories",
+  "percentage",
+  "apply",
+  "column_break_2",
+  "simple",
+  "round",
+  "column_break_4",
+  "variable",
+  "section_break_7",
+  "items"
+ ],
+ "fields": [
+  {
+   "fieldname": "categories",
+   "fieldtype": "Table MultiSelect",
+   "label": "Categories",
+   "options": "Multiple Catorgory"
+  },
+  {
+   "fieldname": "column_break_2",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "simple",
+   "fieldtype": "Check",
+   "label": "Simple"
+  },
+  {
+   "fieldname": "column_break_4",
+   "fieldtype": "Column Break"
+  },
+  {
+   "default": "0",
+   "fieldname": "variable",
+   "fieldtype": "Check",
+   "label": "Variable"
+  },
+  {
+   "fieldname": "percentage",
+   "fieldtype": "Int",
+   "label": "Percentage"
+  },
+  {
+   "fieldname": "section_break_7",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "items",
+   "fieldtype": "Table",
+   "label": "Items",
+   "options": "Sales Item"
+  },
+  {
+   "fieldname": "apply",
+   "fieldtype": "Button",
+   "label": "Apply",
+   "read_only_depends_on": "eval:doc.percentage==0;"
+  },
+  {
+   "default": "0",
+   "fieldname": "round",
+   "fieldtype": "Check",
+   "label": "Round to nearest integer"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2023-02-20 09:52:47.284068",
+ "modified_by": "Administrator",
+ "module": "Slnee",
+ "name": "Sales",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC"
+}

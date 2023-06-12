@@ -29,6 +29,9 @@
   "get_products",
   "get_customers",
   "get_orders",
+  "column_break_25",
+  "get_names",
+  "get_descriptions",
   "tax_per",
   "taxes"
  ],
@@ -183,12 +186,26 @@
    "fieldname": "get_attributes",
    "fieldtype": "Button",
    "label": "Get Attributes"
+  },
+  {
+   "fieldname": "column_break_25",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "get_names",
+   "fieldtype": "Button",
+   "label": "Fetch names from store"
+  },
+  {
+   "fieldname": "get_descriptions",
+   "fieldtype": "Button",
+   "label": "Fetch Descriptions from store"
   }
  ],
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2022-12-12 16:39:13.253298",
+ "modified": "2023-02-13 08:56:18.668952",
  "modified_by": "Administrator",
  "module": "Slnee",
  "name": "Wordpress Store",

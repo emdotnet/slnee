@@ -8,6 +8,8 @@ from frappe.model.document import Document
 from erpnext.stock.get_item_details import get_default_bom
 from frappe.utils import add_days, cint, cstr, flt, get_link_to_form, getdate, nowdate, strip_html
 
+class OverProductionError(frappe.ValidationError):
+	pass
 
 class InternSalesOrder(Document):
 
@@ -52,8 +54,8 @@ class InternSalesOrder(Document):
 					total_work_order_qty = flt(
 						frappe.db.sql(
 							"""select sum(qty) from `tabWork Order`
-						where production_item=%s and intern_sales_order=%s and sales_order_item = %s and docstatus<2""",
-							(i.item_code, self.name, i.name),
+						where production_item=%s and intern_sales_order=%s and docstatus<2""",
+							(i.item_code, self.name),
 						)[0][0]
 					)
 					pending_qty = stock_qty - total_work_order_qty
@@ -75,17 +77,49 @@ class InternSalesOrder(Document):
 					)
 
 		return items
+
+@frappe.whitelist()
+def create_material_request(source_name,target_doc=None):
+	order=frappe.get_doc("Intern Sales Order",source_name)
+	mr=frappe.new_doc("Material Request")
+	mr.intern_order=source_name
+	mr.schedule_date=order.required_by
+	for i in order.items:
+		item=mr.append("items",{})
+		item.item_code=i.item_code
+		item.qty=i.qty
+		item.uom=i.uom
+		item.stock_uom=i.stock_uom
+		item.description=i.description
+	return(mr)
+
+
 @frappe.whitelist()
 def make_work_orders(items, sales_order, company, project=None):
 	"""Make Work Orders against the given Sales Order for the given `items`"""
 	items = json.loads(items).get("items")
 	out = []
+	order=frappe.get_doc("Intern Sales Order",sales_order)
+	allowed_items=order.get_work_order_items()
+	allowed={}
+	for i in allowed_items:
+		allowed[i["item_code"]]=i["pending_qty"]
 	#frappe.throw(str(items))
 	for i in items:
 		if not i.get("bom"):
 			frappe.throw(_("Please select BOM against item {0}").format(i.get("item_code")))
 		if not i.get("pending_qty"):
 			frappe.throw(_("Please select Qty against item {0}").format(i.get("item_code")))
+		qty=i["pending_qty"]
+		if i["item_code"] not in allowed.keys():
+			allowed[i["item_code"]]=0
+		pending_qty=allowed[i["item_code"]]
+		if qty>pending_qty:
+			frappe.throw(
+				_("Cannot produce more Item {0} than Intern Sales Order quantity {1}").format(qty,pending_qty),
+				OverProductionError,
+			)
+
 
 		work_order = frappe.get_doc(
 			dict(
