@@ -13,6 +13,13 @@ class OverProductionError(frappe.ValidationError):
 
 class InternSalesOrder(Document):
 
+	@frappe.whitelist()
+	def change_doc_sataus(self):
+		status="Closed"
+		if self.status=="Closed":
+			status="Open"
+		self.db_set("status",status, commit=True)
+
 	#def before_save(self):
 	#	if self.docstatus==0:
 	#		self.status=="Draft"
@@ -77,6 +84,8 @@ class InternSalesOrder(Document):
 					)
 
 		return items
+
+	
 
 @frappe.whitelist()
 def create_material_request(source_name,target_doc=None):

@@ -12,10 +12,14 @@ app_license = "MIT"
 
 
 doc_events = {
-        "Company": {
-
-        "before_validate": "slnee.color.change_color"
-		}
+    "Company": {
+		"before_validate": "slnee.color.change_color"
+	},
+    "Work Order":{
+        "on_cancel":"slnee.slnee.custom_manufacturing.comman.manufacturing_common.recalculate_completed_qty_in_intern_sales_order"
+	}
+    
+    
 
 }
 

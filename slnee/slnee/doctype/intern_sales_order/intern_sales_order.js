@@ -8,14 +8,43 @@ frappe.ui.form.on('Intern Sales Order', {
 		if (frm.doc.docstatus==1 && (frm.doc.status=="Open" || frm.doc.status=="Partially Manufactured")){
 			frm.add_custom_button(__('Work Order'), () => make_work_order(frm), __('Create'));
 			frm.add_custom_button(__('Material Request'), () => make_material_request(frm), __('Create'));
-	 }},
+			frm.add_custom_button(__("Close"),()=>{
+				frappe.call({method: "change_doc_sataus",doc: frm.doc,
+					callback: function(r) {
+						frm.refresh();
+					}
+				});
+			});
+			
+	}
+		if(frm.doc.status==="Closed"){
+			frm.add_custom_button(__("Open"),()=>{
+				return frappe.call({
+					method: "change_doc_sataus",
+					doc: frm.doc,
+					callback: function(r) {
+						frm.refresh();
+					}
+				});
+			});
+		}
+	},
 	required_by :function(frm) {
 		for (var i =0;i<frm.doc.items.length;i++){
 			frm.doc.items[i].schedule_date=frm.doc.required_by;
 		}
 		refresh_field("items");
-
-	}
+	},
+	// onload:function(frm){
+	// 	if(frm.doc.status==="Open"){
+	// 		console.log("##########");
+	// 		frm.add_custom_button(__("yy"),()=>{
+	// 			frm.doc.status="Close";
+	// 			frm.save();
+	// 		});
+	// 		console.log("@@@@@@@@@@@");
+	// 	}
+	// }
 });
 
 
